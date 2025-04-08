@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.WuziDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.wuzi_uuid_unmber as wuziUuidUnmber
+        ,a.wuzi_name as wuziName
+        ,a.wuzi_types as wuziTypes
+        ,a.Wuzi_kucun_number as wuziKucunNumber
+        ,a.wuzi_min as wuziMin
+        ,a.wuzi_max as wuziMax
+        ,a.wuzi_new_money as wuziNewMoney
+        ,a.wuzi_danwei as wuziDanwei
+        ,a.wuzi_gongyingshang as wuziGongyingshang
+        ,a.cangku_id as cangkuId
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.WuziView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,cangku.cangku_uuid_unmber as cangkuUuidUnmber
+        ,cangku.cangku_name as cangkuName
+        ,cangku.cangku_types as cangkuTypes
+        ,cangku.cangku_address as cangkuAddress
+
+        FROM wuzi  a
+        left JOIN cangku cangku ON a.cangku_id = cangku.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.wuziUuidUnmber != '' and params.wuziUuidUnmber != null and params.wuziUuidUnmber != 'null' ">
+                and a.wuzi_uuid_unmber like CONCAT('%',#{params.wuziUuidUnmber},'%')
+            </if>
+            <if test=" params.wuziName != '' and params.wuziName != null and params.wuziName != 'null' ">
+                and a.wuzi_name like CONCAT('%',#{params.wuziName},'%')
+            </if>
+            <if test="params.wuziTypes != null and params.wuziTypes != ''">
+                and a.wuzi_types = #{params.wuziTypes}
+            </if>
+            <if test="params.wuziKucunNumberStart != null and params.wuziKucunNumberStart != ''">
+                <![CDATA[  and a.Wuzi_kucun_number >= #{params.wuziKucunNumberStart}   ]]>
+            </if>
+            <if test="params.wuziKucunNumberEnd != null and params.wuziKucunNumberEnd != ''">
+                <![CDATA[  and a.Wuzi_kucun_number <= #{params.wuziKucunNumberEnd}   ]]>
+            </if>
+             <if test="params.wuziKucunNumber != null and params.wuziKucunNumber != ''">
+                and a.Wuzi_kucun_number = #{params.wuziKucunNumber}
+             </if>
+            <if test="params.wuziMinStart != null and params.wuziMinStart != ''">
+                <![CDATA[  and a.wuzi_min >= #{params.wuziMinStart}   ]]>
+            </if>
+            <if test="params.wuziMinEnd != null and params.wuziMinEnd != ''">
+                <![CDATA[  and a.wuzi_min <= #{params.wuziMinEnd}   ]]>
+            </if>
+             <if test="params.wuziMin != null and params.wuziMin != ''">
+                and a.wuzi_min = #{params.wuziMin}
+             </if>
+            <if test="params.wuziMaxStart != null and params.wuziMaxStart != ''">
+                <![CDATA[  and a.wuzi_max >= #{params.wuziMaxStart}   ]]>
+            </if>
+            <if test="params.wuziMaxEnd != null and params.wuziMaxEnd != ''">
+                <![CDATA[  and a.wuzi_max <= #{params.wuziMaxEnd}   ]]>
+            </if>
+             <if test="params.wuziMax != null and params.wuziMax != ''">
+                and a.wuzi_max = #{params.wuziMax}
+             </if>
+            <if test="params.wuziNewMoneyStart != null ">
+                <![CDATA[  and a.wuzi_new_money >= #{params.wuziNewMoneyStart}   ]]>
+            </if>
+            <if test="params.wuziNewMoneyEnd != null ">
+                <![CDATA[  and a.wuzi_new_money <= #{params.wuziNewMoneyEnd}   ]]>
+            </if>
+            <if test=" params.wuziDanwei != '' and params.wuziDanwei != null and params.wuziDanwei != 'null' ">
+                and a.wuzi_danwei like CONCAT('%',#{params.wuziDanwei},'%')
+            </if>
+            <if test=" params.wuziGongyingshang != '' and params.wuziGongyingshang != null and params.wuziGongyingshang != 'null' ">
+                and a.wuzi_gongyingshang like CONCAT('%',#{params.wuziGongyingshang},'%')
+            </if>
+            <if test="params.cangkuId != null and params.cangkuId != ''">
+                and (
+                    a.cangku_id = #{params.cangkuId}
+                )
+            </if>
+
+                <!-- 判断仓库信息的id不为空 -->
+            <if test=" params.cangkuIdNotNull != '' and params.cangkuIdNotNull != null and params.cangkuIdNotNull != 'null' ">
+                and a.cangku_id IS NOT NULL
+            </if>
+            <if test=" params.cangkuUuidUnmber != '' and params.cangkuUuidUnmber != null and params.cangkuUuidUnmber != 'null' ">
+                and cangku.cangku_uuid_unmber like CONCAT('%',#{params.cangkuUuidUnmber},'%')
+            </if>
+            <if test=" params.cangkuName != '' and params.cangkuName != null and params.cangkuName != 'null' ">
+                and cangku.cangku_name like CONCAT('%',#{params.cangkuName},'%')
+            </if>
+            <if test="params.cangkuTypes != null  and params.cangkuTypes != ''">
+                and cangku.cangku_types = #{params.cangkuTypes}
+            </if>
+
+            <if test=" params.cangkuAddress != '' and params.cangkuAddress != null and params.cangkuAddress != 'null' ">
+                and cangku.cangku_address like CONCAT('%',#{params.cangkuAddress},'%')
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
